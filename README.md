@@ -16,16 +16,15 @@ repo = 'NI57721/shakyo.vim'
 ```
 
 ## Usage
-### shakyo#run()
-Start shakyo mode, which helps you memorise the text on the current buffer.  
-In the mode a new buffer is created, where you can edit text. Characters you write wrongly are highlighted. If you can manage to write a full line correctly, the end of the line is highlighted.
+### ShakyoRun
+Enter in shakyo mode, which helps you memorise the text on the current buffer.  
+In the mode a new buffer is created. You can edit text there. Characters you write wrongly are highlighted. If you write up a full line correctly, the end of the line is highlighted.
 
-### shakyo#quit()
+### ShakyoQuit
 You can always quit shakyo mode.
 
-### shakyo#clue()
-You can always get clues. This function displays the first letter of characters in the current line which are different from the example text.
-
+### ShakyoClue
+You can always get clues. This displays the first letter of characters in the current line which are different from the example text.
 
 ## Author
 [@NI57721](https://twitter.com/NI57721)
@@ -34,11 +33,11 @@ You can always get clues. This function displays the first letter of characters 
 MIT Licence
 
 ---
-##### TODO
+#### TODO
  - Add an option to ignore some characters.  
- Let's say, where g:shakyo_ignore = ',.;:!?', then you can write too much the characters or omit them.
-  - Add compatibility option between dialects.  
-  When it comes to English, it could be allowed to write 'colour' instead of 'color.' That kind of thing.
-   - Use a test framework.  
-   cf. [thinca/vim-themis](https://github.com/thinca/vim-themis)
+ Where g:shakyo_ignore = ',.;:!?', you're allowed to write too much the characters or omit them.
+ - Add compatibility option between dialects.  
+ In English, let's say, it would be allowed to write 'colour' instead of 'color.' That kind of thing.
+ - Use a test framework.  
+ cf. [thinca/vim-themis](https://github.com/thinca/vim-themis)
 
