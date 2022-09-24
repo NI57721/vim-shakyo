@@ -1,7 +1,7 @@
 # shakyo.vim
-Do you like to memorise text verbatim? Yes! Then, this plugin helps you.
-[]()
-
+Do you like to memorise text verbatim?  
+Yes! This plugin helps you.
+![screenshot](https://raw.githubusercontent.com/NI57721/shakyo.vim/assets/screenshot.gif)
 
 ## Installation
 - [vim-plug](https://github.com/junegunn/vim-plug): Add the line below to your .vimrc.  
@@ -41,3 +41,4 @@ MIT Licence
   When it comes to English, it could be allowed to write 'colour' instead of 'color.' That kind of thing.
    - Use a test framework.  
    cf. [thinca/vim-themis](https://github.com/thinca/vim-themis)
+
