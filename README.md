@@ -1,18 +1,18 @@
-# shakyo.vim
+# vim-shakyo
 Do you like to memorise text verbatim?  
 Yes! This plugin helps you.
-![screenshot](https://raw.githubusercontent.com/NI57721/shakyo.vim/assets/screenshot.gif)
+![screenshot](https://raw.githubusercontent.com/NI57721/vim-shakyo/assets/screenshot.gif)
 
 ## Installation
 - [vim-plug](https://github.com/junegunn/vim-plug): Add the line below to your .vimrc.  
 ```
-Plug 'NI57721/shakyo.vim'
+Plug 'NI57721/vim-shakyo'
 ```
 
 - [dein](https://github.com/Shougo/dein.vim): Add the line below to your dein_lazy.toml.  
 ```
 [[plugins]]
-repo = 'NI57721/shakyo.vim'
+repo = 'NI57721/vim-shakyo'
 ```
 
 ## Usage
