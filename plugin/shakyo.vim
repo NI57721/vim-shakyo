@@ -9,8 +9,8 @@ if exists("g:loaded_example-plugin")
 endif
 let g:loaded_shakyo = 1
 
-command! -nargs=0 ShakyoRun call shakyo#run()
-command! -nargs=0 ShakyoClue call shakyo#clue()
-command! -nargs=0 ShakyoQuit call shakyo#quit()
-command! -nargs=0 ShakyoQuitForce call shakyo#quitforce()
+nnoremap <Plug>(shakyo-run)        <Cmd>call shakyo#run()<CR>
+nnoremap <Plug>(shakyo-quit)       <Cmd>call shakyo#quit()<CR>
+nnoremap <Plug>(shakyo-clue)       <Cmd>call shakyo#clue()<CR>
+nnoremap <Plug>(shakyo-force-quit) <Cmd>call shakyo#force-quit()<CR>
 

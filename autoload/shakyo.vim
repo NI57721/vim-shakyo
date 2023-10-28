@@ -66,7 +66,7 @@ function! shakyo#quit() abort
   let g:shakyo_done = v:false
 endfunction
 
-function! shakyo#quitforce()
+function! shakyo#force-quit()
   call win_gotoid(s:winid)
   tabnew
   execute 'bwipeout!' s:bufnr

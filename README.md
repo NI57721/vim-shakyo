@@ -11,19 +11,25 @@ Plug 'NI57721/shakyo.vim'
 
 - [dein](https://github.com/Shougo/dein.vim): Add the line below to your dein_lazy.toml.  
 ```
-[[plugins]]  
+[[plugins]]
 repo = 'NI57721/shakyo.vim'
 ```
 
 ## Usage
-### ShakyoRun
+```
+" Mapping examples
+nnoremap <leader>r <Plug>(shakyo-run)
+nnoremap <leader>q <Plug>(shakyo-quit)
+nnoremap <leader>c <Plug>(shakyo-clue)
+```
+### shakyo-run
 Enter in shakyo mode, which helps you memorise the text on the current buffer.  
 In the mode a new buffer is created. You can edit text there. Characters you write wrongly are highlighted. If you write up a full line correctly, the end of the line is highlighted.
 
-### ShakyoQuit
+### shakyo-quit
 You can always quit shakyo mode.
 
-### ShakyoClue
+### shakyo-clue
 You can always get clues. This displays the first letter of characters in the current line which are different from the example text.
 
 ## Author
