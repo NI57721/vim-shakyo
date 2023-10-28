@@ -23,7 +23,7 @@ nnoremap <leader>q <Plug>(shakyo-quit)
 nnoremap <leader>c <Plug>(shakyo-clue)
 ```
 ### shakyo-run
-Enter in shakyo mode, which helps you memorise the text on the current buffer.  
+Enter into shakyo mode, which helps you memorise the text on the current buffer.  
 In the mode a new buffer is created. You can edit text there. Characters you write wrongly are highlighted. If you write up a full line correctly, the end of the line is highlighted.
 
 ### shakyo-quit

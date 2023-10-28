@@ -1,15 +1,13 @@
 
 let s:shakyo_mode_prefix = '[shakyo]'
-let g:shakyo_done = v:false
+let g:shakyo_running = v:false
 
 " Hide the current buffer, open its partial copy, and then start the shakyo
 " mode.
 function! shakyo#run() abort
-  if g:shakyo_done
-    echohl ErrorMsg
-    echo "Cannot enter shakyo mode, because you are already in shakyo mode.\n" .
-      \  "Call Quit() once, if you want to continue."
-    echohl None
+  if g:shakyo_running
+    echoerr "Cannot enter shakyo mode, because you are already in shakyo mode.\n" ..
+      \   "Call Quit() once, if you want to continue."
     return
   end
   let s:origin_bufnr = bufnr('%')
@@ -18,42 +16,40 @@ function! shakyo#run() abort
   let s:origin_line_count = len(getbufline(s:origin_bufnr, 1, '$'))
 
   call s:openDuplicatedBuffer()
-  let g:shakyo_done = v:true
-  echohl ModeMsg
-  echom 'In SHAKYO mode'
-  echohl None
+  let g:shakyo_running = v:true
+  let b:keymap_name="Shakyo"
   augroup shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
-    \   if s:winid ==# win_getid()
-    \ |   call s:highlightDifference()
-    \ | endif
+      \   if s:winid ==# win_getid() |
+      \     call s:highlightDifference() |
+      \   endif
   augroup END
 endfunction
 
 " Display the first of characters in the current line which are different
 " from the example one.
 function! shakyo#clue() abort
-  let l:current_line_data = s:getCurrentLineData()
-  if l:current_line_data.line_no > s:origin_line_count
+  let current_line_data = s:getCurrentLineData()
+  if current_line_data.line_no > s:origin_line_count
     return
   endif
-  let l:differentCharIndex = s:getDifferentCharIndex(
-  \   l:current_line_data.current_line,
-  \   l:current_line_data.origin_line
+  let differentCharIndex = s:getDifferentCharIndex(
+  \   current_line_data.current_line,
+  \   current_line_data.origin_line
   \ )
-  if l:differentCharIndex == -1
+  if differentCharIndex == -1
     return
   endif
-  let l:clueCharacter = nr2char(
+  let clueCharacter = nr2char(
   \   strgetchar(
-  \     l:current_line_data.origin_line,
-  \     l:differentCharIndex
+  \     current_line_data.origin_line,
+  \     differentCharIndex
   \   )
   \ )
-  if l:clueCharacter ==# "\xff"
-    let l:clueCharacter = "\x0a"
+  if clueCharacter ==# "\xff"
+    let clueCharacter = "\x0a"
   endif
-  call s:insertCharacer(l:differentCharIndex, l:clueCharacter)
+  call s:insertCharacer(differentCharIndex, clueCharacter)
 endfunction
 
 " Close shakyo mode window and its buffer, and then open and focus on the
@@ -63,7 +59,7 @@ function! shakyo#quit() abort
   tabnew
   execute 'bwipeout!' s:bufnr
   execute 'buffer' s:origin_bufnr
-  let g:shakyo_done = v:false
+  let g:shakyo_running = v:false
 endfunction
 
 function! shakyo#force-quit()
@@ -71,70 +67,70 @@ function! shakyo#force-quit()
   tabnew
   execute 'bwipeout!' s:bufnr
   execute 'buffer' s:origin_bufnr
-  let g:shakyo_done = v:false
+  let g:shakyo_running = v:false
 endfunction
 
 " Create and open a new buffer which has the copied texts of the current
 " buffer from the first line to the previous line of the current line.
 " Hide the current buffer until calling Quit().
 function! s:openDuplicatedBuffer() abort
-  let l:view = winsaveview()
-  let l:filetype = &filetype
-  let l:line_no = line('.')
+  let view = winsaveview()
+  let filetype = &filetype
+  let line_no = line('.')
   if line_no > 1
-    silent execute '1,' . (line_no - 1) . '%y'
+    silent execute '1,' .. (line_no - 1) .. '%y'
   endif
 
-  silent execute 'tabnew' s:shakyo_mode_prefix . s:origin_bufname
+  silent execute 'tabnew' s:shakyo_mode_prefix .. s:origin_bufname
   tabprevious
   hide
   let s:bufnr = bufnr('%')
   let s:winid = win_getid()
-  if l:filetype !=# ''
-    execute  'setfiletype' l:filetype
+  if filetype !=# ''
+    execute  'setfiletype' filetype
   endif
   if line_no > 1
     silent 0put
   endif
-  call winrestview(l:view)
+  call winrestview(view)
 endfunction
 
 " Highlight the difference between the current line and the corresponding
 " line of the origin, if any.
 function! s:highlightDifference() abort
-  let l:current_line_data = s:getCurrentLineData()
-  if l:current_line_data.line_no > s:origin_line_count
+  let current_line_data = s:getCurrentLineData()
+  if current_line_data.line_no > s:origin_line_count
     return
   endif
 
-  let l:differentCharIndex = s:getDifferentCharIndex(
-  \   l:current_line_data.current_line,
-  \   l:current_line_data.origin_line
+  let differentCharIndex = s:getDifferentCharIndex(
+  \   current_line_data.current_line,
+  \   current_line_data.origin_line
   \ )
-  if l:differentCharIndex == -1
+  if differentCharIndex == -1
     match TODO /\%.l$/
     return
   endif
-  execute 'match ErrorMsg /\%.l^.\{' . l:differentCharIndex . '}\zs.*/'
+  execute 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
 endfunction
 
 function! s:insertCharacer(index, char) abort
   if a:index == 0
-    let l:insert = 'i'
+    let insert = 'i'
   elseif a:index == 1
-    let l:insert = 'a'
+    let insert = 'a'
   else
-    let l:insert = (a:index - 1) . 'la'
+    let insert = (a:index - 1) .. 'la'
   endif
-  execute 'normal! 0' . l:insert . a:char
+  execute 'normal! 0' .. insert .. a:char
 endfunction
 
 function! s:getCurrentLineData() abort
-  let l:data = {}
-  let l:data.line_no = line('.')
-  let l:data.current_line = getline(l:data.line_no)
-  let l:data.origin_line = join(getbufline(s:origin_bufnr, l:data.line_no))
-  return l:data
+  let data = {}
+  let data.line_no = line('.')
+  let data.current_line = getline(data.line_no)
+  let data.origin_line = join(getbufline(s:origin_bufnr, data.line_no))
+  return data
 endfunction
 
 " Compare two lines from the first character to the end. Then return the
@@ -142,11 +138,11 @@ endfunction
 " corresponds with the value charcol().
 " If the two lines are exactly the same, then return -1.
 function! s:getDifferentCharIndex(line1, line2) abort
-  for l:i in range(0, strchars(a:line1) - 1)
-    if strgetchar(a:line1, l:i) ==# strgetchar(a:line2, l:i)
+  for i in range(0, strchars(a:line1) - 1)
+    if strgetchar(a:line1, i) ==# strgetchar(a:line2, i)
       continue
     endif
-    return l:i
+    return i
   endfor
   if strchars(a:line1) < strchars(a:line2)
     return strchars(a:line1)
