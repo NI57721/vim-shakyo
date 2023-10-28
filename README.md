@@ -32,12 +32,3 @@ You can always get clues. This displays the first letter of characters in the cu
 ## Licence
 MIT Licence
 
----
-#### TODO
- - Add an option to ignore some characters.  
- Where g:shakyo_ignore = ',.;:!?', you're allowed to write too much the characters or omit them.
- - Add compatibility option between dialects.  
- In English, let's say, it would be allowed to write 'colour' instead of 'color.' That kind of thing.
- - Use a test framework.  
- cf. [thinca/vim-themis](https://github.com/thinca/vim-themis)
-
