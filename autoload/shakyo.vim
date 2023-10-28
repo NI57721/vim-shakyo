@@ -20,7 +20,7 @@ function! shakyo#run() abort
   let b:keymap_name="Shakyo"
   augroup shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
-      \   if s:winid ==# win_getid() |
+      \   if has('s:winid') && s:winid ==# win_getid() |
       \     call s:highlightDifference() |
       \   endif
   augroup END
@@ -62,7 +62,7 @@ function! shakyo#quit() abort
   let g:shakyo_running = v:false
 endfunction
 
-function! shakyo#force-quit()
+function! shakyo#force_quit()
   call win_gotoid(s:winid)
   tabnew
   execute 'bwipeout!' s:bufnr
