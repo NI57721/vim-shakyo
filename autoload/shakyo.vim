@@ -94,14 +94,15 @@ function! s:openDuplicatedBuffer() abort
 endfunction
 
 function! s:highlightDifference() abort
-  let current_line_data = s:getCurrentLineData()
-  if current_line_data.line_no > s:origin_line_count
+  let current_line = s:getLineData('.')
+  echom('c.no: ' .. current_line.no .. ', o.cnt: ' .. s:origin_buffer.line_count)
+  if current_line.no > s:origin_buffer.line_count
     return
   endif
 
   let differentCharIndex = s:getDifferentCharIndex(
-  \   current_line_data.current_line,
-  \   current_line_data.origin_line
+  \   current_line.body,
+  \   current_line.origin
   \ )
   if differentCharIndex == -1
     match TODO /\%.l$/
@@ -121,11 +122,19 @@ function! s:insertCharacer(index, char) abort
   execute 'normal! 0' .. insert .. a:char
 endfunction
 
-function! s:getCurrentLineData() abort
+function! s:getLineData(expr) abort
   let data = {}
-  let data.line_no = line('.')
-  let data.current_line = getline(data.line_no)
-  let data.origin_line = join(getbufline(s:origin_bufnr, data.line_no))
+  let data.no = line(a:expr)
+  let data.body = getline(data.no)
+  let data.origin = getbufline(s:origin_buffer.nr, data.no) ->join()
+  return data
+endfunction
+
+function! s:getBufferData(buf) abort
+  let data = {}
+  let data.nr = bufnr(a:buf)
+  let data.name = bufname()
+  let data.line_count = getbufline(data.nr, 1, '$') ->len()
   return data
 endfunction
 
