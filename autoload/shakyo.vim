@@ -71,25 +71,23 @@ endfunction
 " Create and open a new buffer which has the copied texts of the current
 " buffer from the first line to the previous line of the current line.
 " Hide the current buffer until calling Quit().
-function! s:openDuplicatedBuffer() abort
+function! s:duplicateBuffer(name) abort
   let view = winsaveview()
   let filetype = &filetype
-  let line_no = line('.')
-  if line_no > 1
-    silent execute '1,' .. (line_no - 1) .. '%y'
-  endif
+  let whole_text = getline(1, line('.') - 1)
 
-  silent execute 'tabnew' s:shakyo_mode_prefix .. s:origin_bufname
-  tabprevious
-  hide
+  silent execute 'tabnew ' .. s:shakyo_mode_prefix .. a:name
   let s:bufnr = bufnr('%')
   let s:winid = win_getid()
+  tabprevious
+  hide
+
   if filetype !=# ''
-    execute  'setfiletype' filetype
+    execute  'setfiletype ' .. filetype
   endif
-  if line_no > 1
-    silent 0put
-  endif
+  call append(1, whole_text)
+  normal! ggddGo
+
   call winrestview(view)
 endfunction
 
