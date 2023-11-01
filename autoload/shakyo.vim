@@ -111,7 +111,7 @@ function! s:highlightDifference() abort
   execute 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
 endfunction
 
-function! s:insertCharacer(index, char) abort
+function! s:insertString(index, str) abort
   if a:index == 0
     let insert = 'i'
   elseif a:index == 1
@@ -119,7 +119,7 @@ function! s:insertCharacer(index, char) abort
   else
     let insert = (a:index - 1) .. 'la'
   endif
-  execute 'normal! 0' .. insert .. a:char
+  execute 'normal! 0' .. insert .. a:str
 endfunction
 
 function! s:getLineData(expr) abort
