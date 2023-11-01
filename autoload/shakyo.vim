@@ -1,13 +1,11 @@
+let s:shakyo_mode_prefix = '[Shakyo]'
+let s:shakyo_running = v:false
 
-let s:shakyo_mode_prefix = '[shakyo]'
-let g:shakyo_running = v:false
-
-" Hide the current buffer, open its partial copy, and then start the shakyo
+" Hide the current buffer, open its partial copy, and then start the Shakyo
 " mode.
 function! shakyo#run() abort
-  if g:shakyo_running
-    echoerr "Cannot enter shakyo mode, because you are already in shakyo mode.\n" ..
-      \   "Call Quit() once, if you want to continue."
+  if s:shakyo_running
+    echoerr "Shakyo mode is already running. You need to quit it before running another."
     return
   end
   let s:origin_bufnr = bufnr('%')
@@ -15,19 +13,19 @@ function! shakyo#run() abort
   let s:origin_bufname = bufname()
   let s:origin_line_count = len(getbufline(s:origin_bufnr, 1, '$'))
 
-  call s:openDuplicatedBuffer()
+  call s:duplicateBuffer(s:origin_buffer.name)
   let g:shakyo_running = v:true
   let b:keymap_name="Shakyo"
-  augroup shakyo
+  augroup Shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
-      \   if has('s:winid') && s:winid ==# win_getid() |
-      \     call s:highlightDifference() |
+      \   if exists('s:winid') && s:winid ==# win_getid() |
+      \     execute s:getHighlightCommand() |
       \   endif
   augroup END
 endfunction
 
 " Display the first of characters in the current line which are different
-" from the example one.
+" from the origin.
 function! shakyo#clue() abort
   let current_line_data = s:getCurrentLineData()
   if current_line_data.line_no > s:origin_line_count
@@ -52,22 +50,22 @@ function! shakyo#clue() abort
   call s:insertCharacer(differentCharIndex, clueCharacter)
 endfunction
 
-" Close shakyo mode window and its buffer, and then open and focus on the
-" example buffer instead.
+" Close Shakyo mode window and its buffer, and then open and focus on the
+" origin buffer.
 function! shakyo#quit() abort
   call win_gotoid(s:winid)
   tabnew
-  execute 'bwipeout!' s:bufnr
-  execute 'buffer' s:origin_bufnr
-  let g:shakyo_running = v:false
+  execute 'bwipeout! ' .. s:bufnr
+  execute 'buffer ' .. s:origin_buffer.nr
+  let s:shakyo_running = v:false
 endfunction
 
 function! shakyo#force_to_quit()
   call win_gotoid(s:winid)
   tabnew
-  execute 'bwipeout!' s:bufnr
-  execute 'buffer' s:origin_bufnr
-  let g:shakyo_running = v:false
+  execute 'bwipeout! ' .. s:bufnr
+  execute 'buffer ' .. s:origin_buffer.nr
+  let s:shakyo_running = v:false
 endfunction
 
 " Create and open a new buffer which has the copied texts of the current
@@ -95,8 +93,6 @@ function! s:openDuplicatedBuffer() abort
   call winrestview(view)
 endfunction
 
-" Highlight the difference between the current line and the corresponding
-" line of the origin, if any.
 function! s:highlightDifference() abort
   let current_line_data = s:getCurrentLineData()
   if current_line_data.line_no > s:origin_line_count
