@@ -8,14 +8,11 @@ function! shakyo#run() abort
     echoerr "Shakyo mode is already running. You need to quit it before running another."
     return
   end
-  let s:origin_bufnr = bufnr('%')
-  let s:origin_syntax = exists('b:current_syntax') ? b:current_syntax : ''
-  let s:origin_bufname = bufname()
-  let s:origin_line_count = len(getbufline(s:origin_bufnr, 1, '$'))
+  let s:origin_buffer = s:getBufferData('%')
 
   call s:duplicateBuffer(s:origin_buffer.name)
-  let g:shakyo_running = v:true
-  let b:keymap_name="Shakyo"
+  let s:shakyo_running = v:true
+  let b:keymap_name = 'Shakyo'
   augroup Shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
       \   if exists('s:winid') && s:winid ==# win_getid() |
