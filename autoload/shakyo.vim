@@ -93,11 +93,11 @@ function! s:openDuplicatedBuffer() abort
   call winrestview(view)
 endfunction
 
-function! s:highlightDifference() abort
+function! s:getHighlightCommand() abort
   let current_line = s:getLineData('.')
   echom('c.no: ' .. current_line.no .. ', o.cnt: ' .. s:origin_buffer.line_count)
   if current_line.no > s:origin_buffer.line_count
-    return
+    return ''
   endif
 
   let differentCharIndex = s:getDifferentCharIndex(
@@ -105,10 +105,10 @@ function! s:highlightDifference() abort
   \   current_line.origin
   \ )
   if differentCharIndex == -1
-    match TODO /\%.l$/
-    return
+    return 'match TODO /\%.l$/'
+  else
+    return 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
   endif
-  execute 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
 endfunction
 
 function! s:insertString(index, str) abort
