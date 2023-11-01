@@ -1,120 +1,113 @@
+let s:shakyo_mode_prefix = '[Shakyo]'
+let s:shakyo_running = v:false
 
-let s:shakyo_mode_prefix = '[shakyo]'
-let g:shakyo_running = v:false
-
-" Hide the current buffer, open its partial copy, and then start the shakyo
+" Hide the current buffer, open its partial copy, and then start the Shakyo
 " mode.
 function! shakyo#run() abort
-  if g:shakyo_running
-    echoerr "Cannot enter shakyo mode, because you are already in shakyo mode.\n" ..
-      \   "Call Quit() once, if you want to continue."
+  if s:shakyo_running
+    echoerr "Shakyo mode is already running. You need to quit it before running another."
     return
   end
-  let s:origin_bufnr = bufnr('%')
-  let s:origin_syntax = exists('b:current_syntax') ? b:current_syntax : ''
-  let s:origin_bufname = bufname()
-  let s:origin_line_count = len(getbufline(s:origin_bufnr, 1, '$'))
+  let s:origin_buffer = s:getBufferData('%')
 
-  call s:openDuplicatedBuffer()
-  let g:shakyo_running = v:true
-  let b:keymap_name="Shakyo"
-  augroup shakyo
+  call s:duplicateBuffer(s:origin_buffer.name)
+  let s:shakyo_running = v:true
+  let b:keymap_name = 'Shakyo'
+  augroup Shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
-      \   if has('s:winid') && s:winid ==# win_getid() |
-      \     call s:highlightDifference() |
+      \   if exists('s:winid') && s:winid ==# win_getid() |
+      \     execute s:getHighlightCommand() |
       \   endif
   augroup END
 endfunction
 
 " Display the first of characters in the current line which are different
-" from the example one.
+" from the origin.
 function! shakyo#clue() abort
-  let current_line_data = s:getCurrentLineData()
-  if current_line_data.line_no > s:origin_line_count
+  let current_line = s:getLineData('.')
+  if current_line.no > s:origin_buffer.line_count
     return
   endif
   let differentCharIndex = s:getDifferentCharIndex(
-  \   current_line_data.current_line,
-  \   current_line_data.origin_line
+  \   current_line.body,
+  \   current_line.origin,
   \ )
   if differentCharIndex == -1
     return
   endif
-  let clueCharacter = nr2char(
-  \   strgetchar(
-  \     current_line_data.origin_line,
-  \     differentCharIndex
-  \   )
-  \ )
+  let clueCharacter = strgetchar(current_line.origin, differentCharIndex)
+    \   ->nr2char()
   if clueCharacter ==# "\xff"
     let clueCharacter = "\x0a"
   endif
-  call s:insertCharacer(differentCharIndex, clueCharacter)
+  call s:insertString(differentCharIndex, clueCharacter)
 endfunction
 
-" Close shakyo mode window and its buffer, and then open and focus on the
-" example buffer instead.
+" Close Shakyo mode window and its buffer, and then open and focus on the
+" origin buffer.
 function! shakyo#quit() abort
+  if !s:shakyo_running
+    echoerr "Shakyo mode is not running."
+    return
+  end
+
   call win_gotoid(s:winid)
   tabnew
-  execute 'bwipeout!' s:bufnr
-  execute 'buffer' s:origin_bufnr
-  let g:shakyo_running = v:false
+  execute 'bwipeout! ' .. s:bufnr
+  execute 'buffer ' .. s:origin_buffer.nr
+  let s:shakyo_running = v:false
 endfunction
 
-function! shakyo#force_quit()
+function! shakyo#force_to_quit()
   call win_gotoid(s:winid)
   tabnew
-  execute 'bwipeout!' s:bufnr
-  execute 'buffer' s:origin_bufnr
-  let g:shakyo_running = v:false
+  execute 'bwipeout! ' .. s:bufnr
+  execute 'buffer ' .. s:origin_buffer.nr
+  let s:shakyo_running = v:false
 endfunction
 
 " Create and open a new buffer which has the copied texts of the current
 " buffer from the first line to the previous line of the current line.
 " Hide the current buffer until calling Quit().
-function! s:openDuplicatedBuffer() abort
+function! s:duplicateBuffer(name) abort
   let view = winsaveview()
   let filetype = &filetype
-  let line_no = line('.')
-  if line_no > 1
-    silent execute '1,' .. (line_no - 1) .. '%y'
-  endif
+  let whole_text = getline(1, line('.') - 1)
 
-  silent execute 'tabnew' s:shakyo_mode_prefix .. s:origin_bufname
-  tabprevious
-  hide
+  silent execute 'tabnew ' .. s:shakyo_mode_prefix .. a:name
   let s:bufnr = bufnr('%')
   let s:winid = win_getid()
+  tabprevious
+  hide
+
   if filetype !=# ''
-    execute  'setfiletype' filetype
+    execute  'setfiletype ' .. filetype
   endif
-  if line_no > 1
-    silent 0put
-  endif
+  call append(1, whole_text)
+  normal! ggddGo
+
   call winrestview(view)
 endfunction
 
-" Highlight the difference between the current line and the corresponding
-" line of the origin, if any.
-function! s:highlightDifference() abort
-  let current_line_data = s:getCurrentLineData()
-  if current_line_data.line_no > s:origin_line_count
-    return
+function! s:getHighlightCommand() abort
+  let current_line = s:getLineData('.')
+  echom('c.no: ' .. current_line.no .. ', o.cnt: ' .. s:origin_buffer.line_count)
+  if current_line.no > s:origin_buffer.line_count
+    return ''
   endif
 
   let differentCharIndex = s:getDifferentCharIndex(
-  \   current_line_data.current_line,
-  \   current_line_data.origin_line
+  \   current_line.body,
+  \   current_line.origin
   \ )
   if differentCharIndex == -1
-    match TODO /\%.l$/
-    return
+    return 'match TODO /\%.l$/'
+  else
+    return 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
   endif
-  execute 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
 endfunction
 
-function! s:insertCharacer(index, char) abort
+function! s:insertString(index, str) abort
   if a:index == 0
     let insert = 'i'
   elseif a:index == 1
@@ -122,14 +115,22 @@ function! s:insertCharacer(index, char) abort
   else
     let insert = (a:index - 1) .. 'la'
   endif
-  execute 'normal! 0' .. insert .. a:char
+  execute 'normal! 0' .. insert .. a:str
 endfunction
 
-function! s:getCurrentLineData() abort
+function! s:getLineData(expr) abort
   let data = {}
-  let data.line_no = line('.')
-  let data.current_line = getline(data.line_no)
-  let data.origin_line = join(getbufline(s:origin_bufnr, data.line_no))
+  let data.no = line(a:expr)
+  let data.body = getline(data.no)
+  let data.origin = getbufline(s:origin_buffer.nr, data.no) ->join()
+  return data
+endfunction
+
+function! s:getBufferData(buf) abort
+  let data = {}
+  let data.nr = bufnr(a:buf)
+  let data.name = bufname()
+  let data.line_count = getbufline(data.nr, 1, '$') ->len()
   return data
 endfunction
 
