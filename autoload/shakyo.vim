@@ -27,27 +27,23 @@ endfunction
 " Display the first of characters in the current line which are different
 " from the origin.
 function! shakyo#clue() abort
-  let current_line_data = s:getCurrentLineData()
-  if current_line_data.line_no > s:origin_line_count
+  let current_line = s:getLineData('.')
+  if current_line.no > s:origin_buffer.line_count
     return
   endif
   let differentCharIndex = s:getDifferentCharIndex(
-  \   current_line_data.current_line,
-  \   current_line_data.origin_line
+  \   current_line.body,
+  \   current_line.origin,
   \ )
   if differentCharIndex == -1
     return
   endif
-  let clueCharacter = nr2char(
-  \   strgetchar(
-  \     current_line_data.origin_line,
-  \     differentCharIndex
-  \   )
-  \ )
+  let clueCharacter = strgetchar(current_line.origin, differentCharIndex)
+    \   ->nr2char()
   if clueCharacter ==# "\xff"
     let clueCharacter = "\x0a"
   endif
-  call s:insertCharacer(differentCharIndex, clueCharacter)
+  call s:insertString(differentCharIndex, clueCharacter)
 endfunction
 
 " Close Shakyo mode window and its buffer, and then open and focus on the
