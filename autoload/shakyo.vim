@@ -53,6 +53,11 @@ endfunction
 " Close Shakyo mode window and its buffer, and then open and focus on the
 " origin buffer.
 function! shakyo#quit() abort
+  if !s:shakyo_running
+    echoerr "Shakyo mode is not running."
+    return
+  end
+
   call win_gotoid(s:winid)
   tabnew
   execute 'bwipeout! ' .. s:bufnr
