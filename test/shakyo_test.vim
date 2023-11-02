@@ -1,8 +1,6 @@
 let s:suite  = themis#suite('Test for vim-shakyo')
 let s:assert = themis#helper('assert')
 let s:scope  = themis#helper('scope')
-1
-2
 let s:funcs  = s:scope.funcs('autoload/shakyo.vim')
 let s:vars   = s:scope.vars('autoload/shakyo.vim')
 
@@ -14,13 +12,34 @@ function s:createBufferWith(name, lines) abort
 endfunction
 
 function s:cleanBuffer() abort
-  1buffer!
-  2,$bwipeout!
+  let in_first_buffer = v:false
+  for bufnr in range(1, bufnr('$'))
+    if buflisted(bufnr)
+      execute bufnr .. '+,$bwipeout!'
+      break
+    endif
+  endfor
+endfunction
+
+function s:displayAllBuffers(prefix = '') abort
+  if !empty(a:prefix)
+    call themis#log(a:prefix)
+  endif
+
+  for bufnr in range(1, bufnr('$'))
+    if !buflisted(bufnr)
+      continue
+    endif
+
+    call themis#log(bufnr .. ': ' .. bufname(bufnr))
+    call themis#log(getbufline(bufnr, 1, '$'))
+  endfor
 endfunction
 
 function s:suite.duplicateBuffer() abort
+  call s:cleanBuffer()
   let lines = ['sample text', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-  let bufname_prefix = '[Text]'
+  let bufname_prefix = '[Test]'
   let current_line_no = 7
   let bufname = 'foobar'
   call s:createBufferWith(bufname, lines)
@@ -37,11 +56,10 @@ function s:suite.duplicateBuffer() abort
   let want = add(lines[:current_line_no - 2], '')
   let get = getline(1, '$')
   call s:assert.equals(get, want)
-
-  call s:cleanBuffer()
 endfunction
 
 function s:suite.getHighlightCommand() abort
+  call s:cleanBuffer()
   call s:createBufferWith('origin bufname', ['sample text', 'the second line'])
   let s:vars.origin_buffer = s:funcs.getBufferData('%')
   call s:createBufferWith('shakyo bufname', ['sample text', 'the 2nd line', ''])
@@ -60,11 +78,10 @@ function s:suite.getHighlightCommand() abort
   let want = ''
   let get = s:funcs.getHighlightCommand()
   call s:assert.equals(get, want)
-
-  call s:cleanBuffer()
 endfunction
 
 function s:suite.insertString() abort
+  call s:cleanBuffer()
   call s:createBufferWith('', ['sample text', 'the second line'])
 
   call s:funcs.insertString(0, 'foo')
@@ -87,11 +104,10 @@ function s:suite.insertString() abort
   let want = 'fbaroosample baztext'
   let get = getline('.')
   call s:assert.equals(get, want)
-
-  call s:cleanBuffer()
 endfunction
 
 function s:suite.getLineData() abort
+  call s:cleanBuffer()
   call s:createBufferWith('origin bufname', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
   let s:vars.origin_buffer = s:funcs.getBufferData('%')
   call s:createBufferWith('shakyo bufname', [0, 1, 2, 3, 4, 5, 6, 777, 8, 9])
@@ -105,11 +121,10 @@ function s:suite.getLineData() abort
     \ }
   let get = s:funcs.getLineData(target)
   call s:assert.equals(get, want)
-
-  call s:cleanBuffer()
 endfunction
 
 function s:suite.getBufferData() abort
+  call s:cleanBuffer()
   call s:createBufferWith('sample buffer', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
   let target = '%'
@@ -121,11 +136,11 @@ function s:suite.getBufferData() abort
   let get = s:funcs.getBufferData(target)
   call s:assert.equals(get.name, want.name)
   call s:assert.equals(get.line_count, want.line_count)
-
-  call s:cleanBuffer()
 endfunction
 
 function s:suite.getDifferentCharIndex() abort
+  call s:cleanBuffer()
+
   let target = [
     \   '',
     \   '',
