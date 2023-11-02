@@ -1,4 +1,5 @@
 # vim-shakyo
+![Test](./../../actions/workflows/test.yml/badge.svg)  
 Do you like to memorise text verbatim?  
 Yes! This plugin helps you.
 ![screenshot](https://raw.githubusercontent.com/NI57721/vim-shakyo/assets/screenshot.gif)
