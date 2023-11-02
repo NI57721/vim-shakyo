@@ -5,14 +5,12 @@ let s:shakyo_running = v:false
 " mode.
 function! shakyo#run() abort
   if s:shakyo_running
-    echoerr "Shakyo mode is already running. You need to quit it before running another."
-    return
+    echoerr 'Shakyo mode is already running. You need to quit it before running another.'
   end
   let s:origin_buffer = s:getBufferData('%')
 
   call s:duplicateBuffer(s:origin_buffer.name)
   let s:shakyo_running = v:true
-  let b:keymap_name = 'Shakyo'
   augroup Shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
       \   if exists('s:winid') && s:winid ==# win_getid() |
@@ -24,6 +22,10 @@ endfunction
 " Display the first of characters in the current line which are different
 " from the origin.
 function! shakyo#clue() abort
+  if !s:shakyo_running
+    echoerr 'Shakyo mode is not running.'
+  end
+
   let current_line = s:getLineData('.')
   if current_line.no > s:origin_buffer.line_count
     return
@@ -47,8 +49,7 @@ endfunction
 " origin buffer.
 function! shakyo#quit() abort
   if !s:shakyo_running
-    echoerr "Shakyo mode is not running."
-    return
+    echoerr 'Shakyo mode is not running.'
   end
 
   call win_gotoid(s:winid)
