@@ -40,7 +40,7 @@ endfunction
 function s:suite.use_shakyo() abort
   call s:cleanBuffer()
   let bufname_prefix = '[Test]'
-  let lines = ['sample text', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+  let lines = ['sample text', '1', '0123456789', '3', '4', '5', '6', '7', '8', '9']
   let bufname = 'bufname'
   let s:vars.shakyo_mode_prefix = bufname_prefix
   call s:createBufferWith(bufname, lines)
@@ -55,7 +55,12 @@ function s:suite.use_shakyo() abort
   call s:assert.equals(get, want)
 
   call shakyo#clue()
-  let want = ['sample text', '1', '2']
+  let want = ['sample text', '1', '0']
+  let get = getbufline('%', 1, '$')
+  call s:assert.equals(get, want)
+
+  call shakyo#clue(7)
+  let want = ['sample text', '1', '01234567']
   let get = getbufline('%', 1, '$')
   call s:assert.equals(get, want)
 

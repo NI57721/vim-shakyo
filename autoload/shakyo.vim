@@ -30,13 +30,12 @@ endfunction
 
 " Display the first of characters in the current line which are different
 " from the origin.
-" TODO: Take a number as an argument, and then return the strings whose
-" length is the number instead of a character.
-function! shakyo#clue() abort
+function! shakyo#clue(len = 1) abort
   if !s:shakyo_running
     throw 'Shakyo mode is not running yet.'
   end
 
+  let len = v:count == 0 ? a:len : v:count
   let current_line = s:getLineData('.')
   if current_line.no > s:origin_buffer.line_count
     return
@@ -48,12 +47,18 @@ function! shakyo#clue() abort
   if differentCharIndex == -1
     return
   endif
-  let clueCharacter = strgetchar(current_line.origin, differentCharIndex)
-    \   ->nr2char()
-  if clueCharacter ==# "\xff"
-    let clueCharacter = "\x0a"
-  endif
-  call s:insertString(differentCharIndex, clueCharacter)
+
+  let clueString = ''
+  for i in range(len)
+    let clueCharacter = strgetchar(current_line.origin, differentCharIndex + i)
+          \   ->nr2char()
+    if clueCharacter ==# "\xff"
+      let clueCharacter = "\x0a"
+    endif
+    let clueString ..= clueCharacter
+  endfor
+
+  call s:insertString(differentCharIndex, clueString)
 endfunction
 
 " Close Shakyo mode window and its buffer, and then open and focus on the
