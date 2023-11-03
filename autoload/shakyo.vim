@@ -7,6 +7,9 @@ let s:origin_buffer = ''
 let s:winid = ''
 " The number of the buffer in Shakyo mode
 let s:bufnr = ''
+" Dictionary whose key is a line number, whose value is the correspondent
+" match id.
+let s:match_ids = {}
 
 " Hide the current buffer, open its partial copy, and then start the Shakyo
 " mode.
@@ -23,7 +26,7 @@ function! shakyo#run() abort
   augroup Shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
       \   if exists('s:winid') && s:winid ==# win_getid() |
-      \     execute s:getHighlightCommand() |
+      \     call s:applyHighlight() |
       \   endif
   augroup END
 endfunction
@@ -72,10 +75,15 @@ function! shakyo#quit() abort
   execute 'buffer! ' .. s:origin_buffer.nr
   execute 'bwipeout! ' .. s:bufnr
 
+  for [_, id] in items(s:match_ids)
+    call matchdelete(id)
+  endfor
+
   let s:origin_buffer = ''
   let s:origin_winid = ''
   let s:winid = ''
   let s:bufnr = ''
+  let s:match_ids = {}
   let s:shakyo_running = v:false
 endfunction
 
@@ -98,11 +106,22 @@ function! s:duplicateBuffer(name) abort
   call winrestview(view)
 endfunction
 
-function! s:getHighlightCommand() abort
+function! s:applyHighlight() abort
+  let current_line = line('.')
+  let highlightPattern = s:getHighlightPattern()
+
+  if s:match_ids ->has_key(current_line)
+    call matchdelete(s:match_ids[current_line])
+  endif
+  let s:match_ids[current_line] = matchadd(highlightPattern[0], highlightPattern[1])
+endfunction
+
+" Return [{syntax group}, {regexp}].
+" TODO: Make it possible to specify the syntax groups
+function! s:getHighlightPattern() abort
   let current_line = s:getLineData('.')
-  echom('c.no: ' .. current_line.no .. ', o.cnt: ' .. s:origin_buffer.line_count)
   if current_line.no > s:origin_buffer.line_count
-    return ''
+    return ['', '']
   endif
 
   let differentCharIndex = s:getDifferentCharIndex(
@@ -110,9 +129,9 @@ function! s:getHighlightCommand() abort
   \   current_line.origin
   \ )
   if differentCharIndex == -1
-    return 'match TODO /\%.l$/'
+    return ['WildMenu', '\%.l$']
   else
-    return 'match ErrorMsg /\%.l^.\{' .. differentCharIndex .. '}\zs.*/'
+    return ['ErrorMsg', '\v%.l^.{' .. differentCharIndex .. '}\zs.*']
   endif
 endfunction
 

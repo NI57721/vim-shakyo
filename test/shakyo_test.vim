@@ -92,25 +92,65 @@ function s:suite.duplicateBuffer() abort
   call s:assert.equals(get, want)
 endfunction
 
-function s:suite.getHighlightCommand() abort
+function s:suite.applyHighlight() abort
+  call s:cleanBuffer()
+  let match_ids = s:vars.match_ids
+  call s:createBufferWith('origin bufname', ['sample text', 'the second line'])
+  let s:vars.origin_buffer = s:funcs.getBufferData('%')
+  call s:createBufferWith('shakyo bufname', ['sample text', 'the 2nd line', '', ''])
+
+  let want = []
+  let get = keys(match_ids)
+  call s:assert.equals(get, want)
+
+  normal! 1G
+  call s:funcs.applyHighlight()
+  let want = ['1']
+  let get = keys(match_ids)
+  call s:assert.equals(get, want)
+
+  call s:funcs.applyHighlight()
+  let want = ['1']
+  let get = keys(match_ids)
+  call s:assert.equals(get, want)
+
+  normal! 2G
+  call s:funcs.applyHighlight()
+  let want = ['1', '2']
+  let get = keys(match_ids)
+  call s:assert.equals(get, want)
+
+
+  normal! 10G
+  call s:funcs.applyHighlight()
+  let want = ['1', '2', '4']
+  let get = keys(match_ids)
+  call s:assert.equals(get, want)
+
+  let want = -1
+  let get = match_ids[line('.')]
+  call s:assert.equals(get, want)
+endfunction
+
+function s:suite.getHighlightPattern() abort
   call s:cleanBuffer()
   call s:createBufferWith('origin bufname', ['sample text', 'the second line'])
   let s:vars.origin_buffer = s:funcs.getBufferData('%')
   call s:createBufferWith('shakyo bufname', ['sample text', 'the 2nd line', ''])
 
   normal! 1G
-  let want = 'match TODO /\%.l$/'
-  let get = s:funcs.getHighlightCommand()
+  let want = ['WildMenu', '\%.l$']
+  let get = s:funcs.getHighlightPattern()
   call s:assert.equals(get, want)
 
   normal! 2G
-  let want = 'match ErrorMsg /\%.l^.\{4}\zs.*/'
-  let get = s:funcs.getHighlightCommand()
+  let want = ['ErrorMsg', '\v%.l^.{4}\zs.*']
+  let get = s:funcs.getHighlightPattern()
   call s:assert.equals(get, want)
 
   normal! 3G
-  let want = ''
-  let get = s:funcs.getHighlightCommand()
+  let want = ['', '']
+  let get = s:funcs.getHighlightPattern()
   call s:assert.equals(get, want)
 endfunction
 
