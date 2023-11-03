@@ -1,6 +1,13 @@
 let s:shakyo_mode_prefix = '[Shakyo]'
 let s:shakyo_running = v:false
 
+" The origin buffer data to memorize
+let s:origin_buffer = ''
+" The ID of the window in Shakyo mode
+let s:winid = ''
+" The number of the buffer in Shakyo mode
+let s:bufnr = ''
+
 " Hide the current buffer, open its partial copy, and then start the Shakyo
 " mode.
 function! shakyo#run() abort

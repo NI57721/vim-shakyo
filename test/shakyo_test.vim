@@ -22,7 +22,7 @@ function s:cleanBuffer() abort
   endfor
 endfunction
 
-function s:displayAllBuffers(prefix = '') abort
+function s:logAllBuffers(prefix = '') abort
   if !empty(a:prefix)
     call themis#log(a:prefix)
   endif
