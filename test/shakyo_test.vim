@@ -46,8 +46,8 @@ function s:suite.use_shakyo() abort
   call s:createBufferWith(bufname, lines)
   normal! 3G
 
-  Throws /^Vim(echoerr):Shakyo mode is not running yet\.$/ shakyo#clue()
-  Throws /^Vim(echoerr):Shakyo mode is not running yet\.$/ shakyo#quit()
+  Throws /^Shakyo mode is not running yet\.$/ shakyo#clue()
+  Throws /^Shakyo mode is not running yet\.$/ shakyo#quit()
 
   call shakyo#run()
   let want = bufname_prefix .. bufname

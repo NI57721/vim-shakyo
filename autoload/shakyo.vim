@@ -12,7 +12,7 @@ let s:bufnr = ''
 " mode.
 function! shakyo#run() abort
   if s:shakyo_running
-    echoerr 'Shakyo mode is already running. You need to quit it before running another.'
+    throw 'Shakyo mode is already running. You need to quit it before running another.'
   end
   let s:origin_buffer = s:getBufferData('%')
 
@@ -34,7 +34,7 @@ endfunction
 " length is the number instead of a character.
 function! shakyo#clue() abort
   if !s:shakyo_running
-    echoerr 'Shakyo mode is not running yet.'
+    throw 'Shakyo mode is not running yet.'
   end
 
   let current_line = s:getLineData('.')
@@ -60,7 +60,7 @@ endfunction
 " origin buffer.
 function! shakyo#quit() abort
   if !s:shakyo_running
-    echoerr 'Shakyo mode is not running yet.'
+    throw 'Shakyo mode is not running yet.'
   end
 
   call win_gotoid(s:winid)
