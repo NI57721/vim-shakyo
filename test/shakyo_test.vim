@@ -3,6 +3,7 @@ let s:assert = themis#helper('assert')
 let s:scope  = themis#helper('scope')
 let s:funcs  = s:scope.funcs('autoload/shakyo.vim')
 let s:vars   = s:scope.vars('autoload/shakyo.vim')
+call themis#helper('command')
 
 function s:createBufferWith(name, lines) abort
   execute 'new ' .. a:name
@@ -21,7 +22,7 @@ function s:cleanBuffer() abort
   endfor
 endfunction
 
-function s:displayAllBuffers(prefix = '') abort
+function s:logAllBuffers(prefix = '') abort
   if !empty(a:prefix)
     call themis#log(a:prefix)
   endif
@@ -34,6 +35,34 @@ function s:displayAllBuffers(prefix = '') abort
     call themis#log(bufnr .. ': ' .. bufname(bufnr))
     call themis#log(getbufline(bufnr, 1, '$'))
   endfor
+endfunction
+
+function s:suite.use_shakyo() abort
+  call s:cleanBuffer()
+  let bufname_prefix = '[Test]'
+  let lines = ['sample text', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+  let bufname = 'bufname'
+  let s:vars.shakyo_mode_prefix = bufname_prefix
+  call s:createBufferWith(bufname, lines)
+  normal! 3G
+
+  Throws /^Vim(echoerr):Shakyo mode is not running yet\.$/ shakyo#clue()
+  Throws /^Vim(echoerr):Shakyo mode is not running yet\.$/ shakyo#quit()
+
+  call shakyo#run()
+  let want = bufname_prefix .. bufname
+  let get = bufname('%')
+  call s:assert.equals(get, want)
+
+  call shakyo#clue()
+  let want = ['sample text', '1', '2']
+  let get = getbufline('%', 1, '$')
+  call s:assert.equals(get, want)
+
+  call shakyo#quit()
+  let want = bufname
+  let get = bufname('%')
+  call s:assert.equals(get, want)
 endfunction
 
 function s:suite.duplicateBuffer() abort

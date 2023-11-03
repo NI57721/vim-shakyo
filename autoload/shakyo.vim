@@ -1,6 +1,13 @@
 let s:shakyo_mode_prefix = '[Shakyo]'
 let s:shakyo_running = v:false
 
+" The origin buffer data to memorize
+let s:origin_buffer = ''
+" The ID of the window in Shakyo mode
+let s:winid = ''
+" The number of the buffer in Shakyo mode
+let s:bufnr = ''
+
 " Hide the current buffer, open its partial copy, and then start the Shakyo
 " mode.
 function! shakyo#run() abort
@@ -10,6 +17,8 @@ function! shakyo#run() abort
   let s:origin_buffer = s:getBufferData('%')
 
   call s:duplicateBuffer(s:origin_buffer.name)
+  let s:bufnr = bufnr('%')
+  let s:winid = win_getid()
   let s:shakyo_running = v:true
   augroup Shakyo
     autocmd! TextChangedI,TextChangedP,CursorMoved,CursorMovedI *
@@ -21,9 +30,11 @@ endfunction
 
 " Display the first of characters in the current line which are different
 " from the origin.
+" TODO: Take a number as an argument, and then return the strings whose
+" length is the number instead of a character.
 function! shakyo#clue() abort
   if !s:shakyo_running
-    echoerr 'Shakyo mode is not running.'
+    echoerr 'Shakyo mode is not running yet.'
   end
 
   let current_line = s:getLineData('.')
@@ -49,39 +60,31 @@ endfunction
 " origin buffer.
 function! shakyo#quit() abort
   if !s:shakyo_running
-    echoerr 'Shakyo mode is not running.'
+    echoerr 'Shakyo mode is not running yet.'
   end
 
   call win_gotoid(s:winid)
-  tabnew
+  execute 'buffer! ' .. s:origin_buffer.nr
   execute 'bwipeout! ' .. s:bufnr
-  execute 'buffer ' .. s:origin_buffer.nr
+
+  let s:origin_buffer = ''
+  let s:origin_winid = ''
+  let s:winid = ''
+  let s:bufnr = ''
   let s:shakyo_running = v:false
 endfunction
 
-function! shakyo#force_to_quit()
-  call win_gotoid(s:winid)
-  tabnew
-  execute 'bwipeout! ' .. s:bufnr
-  execute 'buffer ' .. s:origin_buffer.nr
-  let s:shakyo_running = v:false
-endfunction
-
-" Create and open a new buffer which has the copied texts of the current
-" buffer from the first line to the previous line of the current line.
-" Hide the current buffer until calling Quit().
+" Hide the current buffer and create a new buffer, in which the texts of the
+" current buffer are copied from the first line to the line just before the
+" current line.
+" TODO: take an argument. s:duplicateBufferUpTo(line)
 function! s:duplicateBuffer(name) abort
   let view = winsaveview()
   let filetype = &filetype
   let whole_text = getline(1, line('.') - 1)
 
-  silent execute 'tabnew ' .. s:shakyo_mode_prefix .. a:name
-  let s:bufnr = bufnr('%')
-  let s:winid = win_getid()
-  tabprevious
-  hide
-
-  if filetype !=# ''
+  silent execute 'hide edit ' .. s:shakyo_mode_prefix .. a:name
+  if filetype != ''
     execute  'setfiletype ' .. filetype
   endif
   call append(1, whole_text)
