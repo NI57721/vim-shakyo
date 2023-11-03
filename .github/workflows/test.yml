@@ -17,7 +17,6 @@ jobs:
             vim_version: 'v9.0.1499'
           - platform: 'Linux'
             os: 'ubuntu-latest'
-            download: 'never'
 
     runs-on: '${{ matrix.os }}'
     steps:
