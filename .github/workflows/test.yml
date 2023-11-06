@@ -8,7 +8,7 @@ jobs:
       on ${{ matrix.os }}
     strategy:
       matrix:
-        vim_type: ['Vim', 'Neovim']
+        vim_type: ['Vim']
         version: ['head', 'stable']
         platform: ['Linux']
         include:
