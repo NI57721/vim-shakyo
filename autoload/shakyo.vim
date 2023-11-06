@@ -31,9 +31,13 @@ function! shakyo#run() abort
   augroup END
 endfunction
 
+function! shakyo#clue(type = '') abort
+  call shakyo#_clue(v:count1)
+endfunction
+
 " Display the first of characters in the current line which are different
 " from the origin.
-function! shakyo#clue(len = 1) abort
+function! shakyo#_clue(len = 1) abort
   if !s:shakyo_running
     throw 'Shakyo mode is not running yet.'
   end
