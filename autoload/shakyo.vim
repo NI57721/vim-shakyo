@@ -47,25 +47,25 @@ function! shakyo#_clue(len = 1) abort
   if current_line.no > s:origin_buffer.line_count
     return
   endif
-  let differentCharIndex = s:getDifferentCharIndex(
+  let different_char_index = s:getDifferentCharIndex(
   \   current_line.body,
   \   current_line.origin,
   \ )
-  if differentCharIndex == -1
+  if different_char_index == -1
     return
   endif
 
-  let clueString = ''
+  let clue_string = ''
   for i in range(len)
-    let clueCharacter = strgetchar(current_line.origin, differentCharIndex + i)
+    let clue_character = strgetchar(current_line.origin, different_char_index + i)
           \   ->nr2char()
-    if clueCharacter ==# "\xff"
-      let clueCharacter = "\x0a"
+    if clue_character ==# "\xff"
+      let clue_character = "\x0a"
     endif
-    let clueString ..= clueCharacter
+    let clue_string ..= clue_character
   endfor
 
-  call s:insertString(differentCharIndex, clueString)
+  call s:insertString(different_char_index, clue_string)
 endfunction
 
 " Close Shakyo mode window and its buffer, and then open and focus on the
@@ -104,20 +104,24 @@ function! s:duplicateBuffer(name) abort
   if filetype != ''
     execute  'setfiletype ' .. filetype
   endif
-  call append(1, whole_text)
-  normal! ggddGo
+  call append(0, whole_text)
+  normal! G
 
   call winrestview(view)
 endfunction
 
 function! s:applyHighlight() abort
   let current_line = line('.')
-  let highlightPattern = s:getHighlightPattern()
+  let highlight_pattern = s:getHighlightPattern()
 
   if s:match_ids ->has_key(current_line)
     call matchdelete(s:match_ids[current_line])
   endif
-  let s:match_ids[current_line] = matchadd(highlightPattern[0], highlightPattern[1])
+
+  let match_result = matchadd(highlight_pattern[0], highlight_pattern[1])
+  if match_result != -1
+    let s:match_ids[current_line] =  match_result
+  endif
 endfunction
 
 " Return [{syntax group}, {regexp}].
@@ -128,14 +132,14 @@ function! s:getHighlightPattern() abort
     return ['', '']
   endif
 
-  let differentCharIndex = s:getDifferentCharIndex(
+  let different_char_index = s:getDifferentCharIndex(
   \   current_line.body,
   \   current_line.origin
   \ )
   if differentCharIndex == -1
     return ['WildMenu', '\%.l$']
   else
-    return ['ErrorMsg', '\v%.l^.{' .. differentCharIndex .. '}\zs.*']
+    return ['ErrorMsg', '\v%.l^.{' .. different_char_index .. '}\zs.*']
   endif
 endfunction
 

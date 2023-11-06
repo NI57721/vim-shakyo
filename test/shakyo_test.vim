@@ -156,12 +156,8 @@ function s:suite.applyHighlight() abort
 
   normal! 10G
   call s:funcs.applyHighlight()
-  let want = ['1', '2', '4']
+  let want = ['1', '2']
   let get = keys(match_ids)
-  call s:assert.equals(get, want)
-
-  let want = -1
-  let get = match_ids[line('.')]
   call s:assert.equals(get, want)
 endfunction
 
