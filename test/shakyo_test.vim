@@ -37,7 +37,37 @@ function s:logAllBuffers(prefix = '') abort
   endfor
 endfunction
 
-function s:suite.use_shakyo() abort
+function s:suite.shakyoClueDotRepeat() abort
+  call s:cleanBuffer()
+  let lines = ['sample text', '1', '0123456789', '3', '4', '5', '6', '7', '8', '9']
+  call s:createBufferWith('hoge', lines)
+  normal! 3G
+
+  try
+    call shakyo#run()
+    nnoremap <buffer> <Space>c <Plug>(shakyo-clue)
+
+    normal 1 c
+    normal! .
+    let want = ['sample text', '1', '01']
+    let get = getbufline('%', 1, '$')
+    call s:assert.equals(get, want)
+
+    normal! 3.
+    let want = ['sample text', '1', '01234']
+    let get = getbufline('%', 1, '$')
+    call s:assert.equals(get, want)
+
+    normal 4 c
+    let want = ['sample text', '1', '012345678']
+    let get = getbufline('%', 1, '$')
+    call s:assert.equals(get, want)
+  finally
+    call shakyo#quit()
+  endtry
+endfunction
+
+function s:suite.useShakyo() abort
   call s:cleanBuffer()
   let bufname_prefix = '[Test]'
   let lines = ['sample text', '1', '0123456789', '3', '4', '5', '6', '7', '8', '9']
@@ -46,28 +76,31 @@ function s:suite.use_shakyo() abort
   call s:createBufferWith(bufname, lines)
   normal! 3G
 
-  Throws /^Shakyo mode is not running yet\.$/ shakyo#clue()
+  Throws /^Shakyo mode is not running yet\.$/ shakyo#_clue()
   Throws /^Shakyo mode is not running yet\.$/ shakyo#quit()
 
-  call shakyo#run()
-  let want = bufname_prefix .. bufname
-  let get = bufname('%')
-  call s:assert.equals(get, want)
+  try
+    call shakyo#run()
+    let want = bufname_prefix .. bufname
+    let get = bufname('%')
+    call s:assert.equals(get, want)
 
-  call shakyo#clue()
-  let want = ['sample text', '1', '0']
-  let get = getbufline('%', 1, '$')
-  call s:assert.equals(get, want)
+    call shakyo#_clue()
+    let want = ['sample text', '1', '0']
+    let get = getbufline('%', 1, '$')
+    call s:assert.equals(get, want)
 
-  call shakyo#clue(7)
-  let want = ['sample text', '1', '01234567']
-  let get = getbufline('%', 1, '$')
-  call s:assert.equals(get, want)
+    call shakyo#_clue(7)
+    let want = ['sample text', '1', '01234567']
+    let get = getbufline('%', 1, '$')
+    call s:assert.equals(get, want)
+  finally
+    call shakyo#quit()
+  endtry
 
-  call shakyo#quit()
-  let want = bufname
-  let get = bufname('%')
-  call s:assert.equals(get, want)
+    let want = bufname
+    let get = bufname('%')
+    call s:assert.equals(get, want)
 endfunction
 
 function s:suite.duplicateBuffer() abort
