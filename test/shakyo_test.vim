@@ -9,7 +9,7 @@ function s:createBufferWith(name, lines) abort
   execute 'new ' .. a:name
   call append(0, a:lines)
   $delete
-  normal! 1G
+  call setcursorcharpos(1, 1)
 endfunction
 
 function s:cleanBuffer() abort
@@ -41,7 +41,7 @@ function s:suite.shakyoClueDotRepeat() abort
   call s:cleanBuffer()
   let lines = ['sample text', '1', '0123456789', '3', '4', '5', '6', '7', '8', '9']
   call s:createBufferWith('hoge', lines)
-  normal! 3G
+  call setcursorcharpos(3, 1)
 
   try
     call shakyo#run()
@@ -74,7 +74,7 @@ function s:suite.useShakyo() abort
   let bufname = 'bufname'
   let s:vars.shakyo_mode_prefix = bufname_prefix
   call s:createBufferWith(bufname, lines)
-  normal! 3G
+  call setcursorcharpos(3, 1)
 
   Throws /^Shakyo mode is not running yet\.$/ shakyo#_clue()
   Throws /^Shakyo mode is not running yet\.$/ shakyo#quit()
@@ -110,7 +110,7 @@ function s:suite.duplicateBuffer() abort
   let current_line_no = 7
   let bufname = 'foobar'
   call s:createBufferWith(bufname, lines)
-  execute 'normal! ' .. current_line_no .. 'G'
+  call setcursorcharpos(current_line_no, 1)
 
   let s:vars.shakyo_mode_prefix = bufname_prefix
   call s:funcs.duplicateBuffer(bufname)
@@ -136,7 +136,7 @@ function s:suite.applyHighlight() abort
   let get = keys(match_ids)
   call s:assert.equals(get, want)
 
-  normal! 1G
+  call setcursorcharpos(1, 1)
   call s:funcs.applyHighlight()
   let want = ['1']
   let get = keys(match_ids)
@@ -147,14 +147,14 @@ function s:suite.applyHighlight() abort
   let get = keys(match_ids)
   call s:assert.equals(get, want)
 
-  normal! 2G
+  call setcursorcharpos(2, 1)
   call s:funcs.applyHighlight()
   let want = ['1', '2']
   let get = keys(match_ids)
   call s:assert.equals(get, want)
 
 
-  normal! 10G
+  call setcursorcharpos(10, 1)
   call s:funcs.applyHighlight()
   let want = ['1', '2']
   let get = keys(match_ids)
@@ -167,17 +167,17 @@ function s:suite.getHighlightPattern() abort
   let s:vars.origin_buffer = s:funcs.getBufferData('%')
   call s:createBufferWith('shakyo bufname', ['sample text', 'the 2nd line', ''])
 
-  normal! 1G
+  call setcursorcharpos(1, 1)
   let want = ['WildMenu', '\%.l$']
   let get = s:funcs.getHighlightPattern()
   call s:assert.equals(get, want)
 
-  normal! 2G
+  call setcursorcharpos(2, 1)
   let want = ['ErrorMsg', '\v%.l^.{4}\zs.*']
   let get = s:funcs.getHighlightPattern()
   call s:assert.equals(get, want)
 
-  normal! 3G
+  call setcursorcharpos(3, 1)
   let want = ['', '']
   let get = s:funcs.getHighlightPattern()
   call s:assert.equals(get, want)
@@ -188,21 +188,21 @@ function s:suite.insertString() abort
   call s:createBufferWith('', ['sample text', 'the second line'])
 
   call s:funcs.insertString(0, 'foo')
-  normal! 1G
+  call setcursorcharpos(1, 1)
   let target = '.'
   let want = 'foosample text'
   let get = getline('.')
   call s:assert.equals(get, want)
 
   call s:funcs.insertString(1, 'bar')
-  normal! 1G
+  call setcursorcharpos(1, 1)
   let target = '.'
   let want = 'fbaroosample text'
   let get = getline('.')
   call s:assert.equals(get, want)
 
   call s:funcs.insertString(13, 'baz')
-  normal! 1G
+  call setcursorcharpos(1, 1)
   let target = '.'
   let want = 'fbaroosample baztext'
   let get = getline('.')
@@ -214,7 +214,7 @@ function s:suite.getLineData() abort
   call s:createBufferWith('origin bufname', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
   let s:vars.origin_buffer = s:funcs.getBufferData('%')
   call s:createBufferWith('shakyo bufname', [0, 1, 2, 3, 4, 5, 6, 777, 8, 9])
-  normal! 8G
+  call setcursorcharpos(8, 1)
 
   let target = '.'
   let want = #{

@@ -104,8 +104,8 @@ function! s:duplicateBuffer(name) abort
   if filetype != ''
     execute  'setfiletype ' .. filetype
   endif
-  call append(0, whole_text)
-  normal! G
+  call setline(1, add(whole_text, ''))
+  call setcursorcharpos('$', 1)
 
   call winrestview(view)
 endfunction
@@ -136,7 +136,7 @@ function! s:getHighlightPattern() abort
   \   current_line.body,
   \   current_line.origin
   \ )
-  if differentCharIndex == -1
+  if different_char_index == -1
     return ['WildMenu', '\%.l$']
   else
     return ['ErrorMsg', '\v%.l^.{' .. different_char_index .. '}\zs.*']
