@@ -8,19 +8,19 @@ Yes! This plugin helps you.
 You can use your preferred plugin manager.
 ```vim
 " dein.vim
-call dein#add('NI57721/vim-socrates')
+call dein#add('NI57721/vim-shakyo')
 
 " vim-plug
-Plug 'NI57721/vim-socrates'
+Plug 'NI57721/vim-shakyo'
 
 " neobundle
-NeoBundle 'NI57721/vim-socrates'
+NeoBundle 'NI57721/vim-shakyo'
 
 " jetpack
-Jetpack 'NI57721/vim-socrates'
+Jetpack 'NI57721/vim-shakyo'
 
 " packer
-packer.startup(function() use 'NI57721/vim-socrates' end)
+packer.startup(function() use 'NI57721/vim-shakyo' end)
 ```
 
 ## Usage
