@@ -37,10 +37,31 @@ function s:logAllBuffers(prefix = '') abort
   endfor
 endfunction
 
+function s:suite.shakyoHighlightConfig() abort
+  call s:cleanBuffer()
+  let config = s:vars.config
+
+  let want = #{completed: 'WildMenu', wrong: 'ErrorMsg'}
+  let get = config.highlight
+  call s:assert.equals(get, want)
+
+  call shakyo#config(#{highlight: #{completed: 'Foo'}})
+  let want = #{completed: 'Foo', wrong: 'ErrorMsg'}
+  let get = config.highlight
+  call s:assert.equals(get, want)
+
+  call shakyo#config(#{highlight: #{wrong: 'Bar'}})
+  let want = #{completed: 'Foo', wrong: 'Bar'}
+  let get = config.highlight
+  call s:assert.equals(get, want)
+
+  call shakyo#config(#{highlight: #{completed: 'WildMenu', wrong: 'ErrorMsg'}})
+endfunction
+
 function s:suite.shakyoClueDotRepeat() abort
   call s:cleanBuffer()
   let lines = ['sample text', '1', '0123456789', '3', '4', '5', '6', '7', '8', '9']
-  call s:createBufferWith('hoge', lines)
+  call s:createBufferWith('foo', lines)
   call setcursorcharpos(3, 1)
 
   try
