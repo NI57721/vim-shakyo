@@ -25,7 +25,7 @@ packer.startup(function() use 'NI57721/vim-socrates' end)
 
 ## Usage
 By adding the key mappings below you can run/quit Shakyo mode, and get a
-```
+```vim
 " Examples of settings
 nnoremap <leader>r <Plug>(shakyo-run)
 nnoremap <leader>q <Plug>(shakyo-quit)
@@ -38,7 +38,7 @@ buffer you are supposed to write the following text, depending only on your
 memory. The lines you have written up correctly are highlighted at the ends
 of the lines to let you know that you have made it. On the other hand, when
 you write a wrong text, the part is highlighted for you to know that you have
-mistaken.
+mistaken. See Config to learn how to change the highlight groups.
 
 ### Quit
 When you quit Shakyo mode, you return to the original buffer as it was when
@@ -47,6 +47,23 @@ you start Shakyo mode.
 ### Clue
 If you get stuck, you can get a clue whenever you like. The next letter shows
 up.
+
+### Config
+You can specify some attributes by calling shakyo#config().
+
+#### Highlight
+The ends of correctly written lines are highlighted by highlight.completed,
+whose default value is 'WildMenu'.
+Wrongly written characters are highlighted by highlight.wrong, whose default
+value is 'ErrorMsg'.
+```vim
+    call shakyo#config(#{
+      \   highlight: #{
+      \     completed: 'WildMenu',
+      \     wrong: 'ErrorMsg'
+      \   }
+      \ })
+```
 
 ## Variables
 - g:shakyo_ignore

@@ -1,5 +1,6 @@
 let s:shakyo_mode_prefix = '[Shakyo]'
 let s:shakyo_running = v:false
+let s:config = #{highlight: #{completed: 'WildMenu', wrong: 'ErrorMsg'}}
 
 " The origin buffer data to memorize
 let s:origin_buffer = ''
@@ -29,6 +30,13 @@ function! shakyo#run() abort
       \     call s:applyHighlight() |
       \   endif
   augroup END
+endfunction
+
+function! shakyo#config(config) abort
+  let hls = a:config ->get('highlight', s:config.highlight)
+  let s:config.highlight.completed = hls ->get('completed', s:config.highlight.completed)
+  let s:config.highlight.wrong = hls ->get('wrong', s:config.highlight.wrong)
+  let s:config.opts   = a:config ->get('opts', {})
 endfunction
 
 function! shakyo#clue(type = '') abort
@@ -137,9 +145,9 @@ function! s:getHighlightPattern() abort
   \   current_line.origin
   \ )
   if different_char_index == -1
-    return ['WildMenu', '\%.l$']
+    return [s:config.highlight.completed, '\%.l$']
   else
-    return ['ErrorMsg', '\v%.l^.{' .. different_char_index .. '}\zs.*']
+    return [s:config.highlight.wrong, '\v%.l^.{' .. different_char_index .. '}\zs.*']
   endif
 endfunction
 

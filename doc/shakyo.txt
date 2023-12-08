@@ -9,6 +9,8 @@ CONTENTS                                                       *shakyo-contents*
 
 INSTALLATION                                                    |shakyo-install|
 USAGE                                                             |shakyo-usage|
+CONFIG                                                           |shakyo-config|
+  HIGHLIGHT                                                   |shakyo-highlight|
 VARIABLES                                                     |shakyo-variables|
 CHANGELOG                                                     |shakyo-changelog|
 
@@ -37,7 +39,6 @@ You can use your preferred plugin manager.
 <
 
 
-
 ==============================================================================
 USAGE                                                             *shakyo-usage*
 
@@ -61,8 +62,30 @@ mistaken.
 If you get stuck, you can get a clue whenever you like. The next letter shows
 up.
 When you quit Shakyo mode, you return to the original buffer as it was when
-you start Shakyo mode.
+you start Shakyo mode. See |shakyo-config| to learn how to change the
+highlight groups.
 
+
+
+==============================================================================
+CONFIG                                                           *shakyo-config*
+
+You can specify some attributes by calling shakyo#config().
+
+HIGHLIGHT                                                     *shakyo-highlight*
+The ends of correctly written lines are highlighted by highlight.completed,
+whose default value is 'WildMenu'.
+Wrongly written characters are highlighted by highlight.wrong, whose default
+value is 'ErrorMsg'.
+>
+    " Example
+    call shakyo#config(#{
+      \   highlight: #{
+      \     completed: 'WildMenu',
+      \     wrong: 'ErrorMsg'
+      \   }
+      \ })
+<
 
 
 ==============================================================================
