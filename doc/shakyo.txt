@@ -11,7 +11,6 @@ INSTALLATION                                                    |shakyo-install|
 USAGE                                                             |shakyo-usage|
 CONFIG                                                           |shakyo-config|
   HIGHLIGHT                                                   |shakyo-highlight|
-VARIABLES                                                     |shakyo-variables|
 CHANGELOG                                                     |shakyo-changelog|
 
 
@@ -89,33 +88,14 @@ value is 'ErrorMsg'.
 
 
 ==============================================================================
-VARIABLES                                                     *shakyo-variables*
-
-g:shakyo_ignore                                                *g:shakyo_ignore*
-    You can set a string to this variable. It allows you to omit each
-    character in the string.
->
-    " Example
-    let g:shakyo_ignore = ',.;:!?'
-<
-
-g:shakyo_inconsistencies                               *g:shakyo_inconsistencies*
-    You can set a list which elements are a list of strings to this variable.
-    It allows you to select either of the spelling inconsistencies of a word.
-    In the example below, you can write "color" in stead of "colour", and
-    vice versa.
->
-    " Example
-    let g:shakyo_inconsistencies = [
-      \   ['colour', 'color'],
-      \   ['grey', 'gray'],
-      \   ['centre', 'center'],
-      \ ]
-<
-
-
-==============================================================================
 CHANGELOG                                                     *shakyo-changelog*
+
+1.0.0   8 Dec 2023
+        - Make it possible to display clues by dot repeat
+        - Make it possible to add a count number before shakyo#clue()
+        - Use a testing framework, themis.vim
+        - Match multiple lines
+        - Make it possible to specific highlight groups
 
 0.1.0   23 Sep 2022
         - First release

@@ -31,6 +31,7 @@ nnoremap <leader>r <Plug>(shakyo-run)
 nnoremap <leader>q <Plug>(shakyo-quit)
 nnoremap <leader>c <Plug>(shakyo-clue)
 ```
+
 ### Run
 Once you start Shakyo mode, a new buffer is created which has the whole text
 from the beginning of the buffer to the line on the cursor. In this new
@@ -63,29 +64,6 @@ value is 'ErrorMsg'.
       \     wrong: 'ErrorMsg'
       \   }
       \ })
-```
-
-## Variables
-- g:shakyo_ignore
-    You can set a string to this variable. It allows you to omit each
-    character in the string.
-```vim
-    " Example
-    let g:shakyo_ignore = ',.;:!?'
-```
-
-- g:shakyo_inconsistencies
-    You can set a list which elements are a list of strings to this variable.
-    It allows you to select either of the spelling inconsistencies of a word.
-    In the example below, you can write "color" in stead of "colour", and
-    vice versa.
-```vim
-    " Example
-    let g:shakyo_inconsistencies = [
-      \   ['colour', 'color'],
-      \   ['grey', 'gray'],
-      \   ['centre', 'center'],
-      \ ]
 ```
 
 ## Licence
